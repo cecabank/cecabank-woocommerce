@@ -5,7 +5,7 @@
  * Description: Plugin de WooCommerce para conectar con la pasarela de Cecabank.
  * Author: Cecabank, S.A.
  * Author URI: https://www.cecabank.es/
- * Version: 0.1.1
+ * Version: 0.1.2
  * Text Domain: wc_cecabank
  * Domain Path: /i18n/languages/
  *
@@ -69,7 +69,7 @@ try {
  *
  * @class 		WC_Gateway_Cecabank
  * @extends		WC_Payment_Gateway
- * @version		0.1.1
+ * @version		0.1.2
  * @package		WooCommerce/Classes/Payment
  * @author 		Cecabank, S.A.
  */
@@ -330,7 +330,7 @@ function wc_cecabank_gateway_init() {
             $result = $this->process_regular_payment( $cecabank_client, $order, $order_id );
 
             // Mark as on-hold (we're awaiting the payment)
-            $order->update_status( 'on-hold', __( 'Esperando la confirmación del pago por Cecabank', 'wc-gateway-cecabank' ) );
+            // $order->update_status( 'on-hold', __( 'Esperando la confirmación del pago por Cecabank', 'wc-gateway-cecabank' ) );
 
             if ( version_compare( WOOCOMMERCE_VERSION, '2.0', '<' ) ) {
                 $woocommerce->cart->empty_cart();
