@@ -7,6 +7,9 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 El plugin de Cecabank para WooCommerce permite realizar cobros a tus clientes utilizando el TPV de Cecabank.
 
+== Más información ==
+Para tener más información de como instalar el plugin de Cecabank en WooCommerce puede ver el manual de este plugin en la sección Ayuda y Recursos de la consola de Cecabank.
+
 == Descripción ==
 El plugin de Cecabank para WooCommerce permite realizar cobros a tus clientes utilizando el TPV de Cecabank.
 
