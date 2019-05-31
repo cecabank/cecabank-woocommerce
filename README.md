@@ -1,6 +1,10 @@
 # Cecabank Plugin WooCommerce
 
 
+# Más información
+
+Para tener más información de como instalar el plugin de Cecabank en WooCommerce puede ver el manual de este plugin en la sección Ayuda y Recursos de la consola de Cecabank.
+
 # Descripción
 
 El plugin de Cecabank para WooCommerce permite realizar cobros a tus clientes utilizando el TPV de Cecabank.
