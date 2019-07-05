@@ -357,6 +357,7 @@ class Client
         if ($this->options['Cifrado'] === 'SHA2') {
             if ( $replace ) {
                 $message = str_replace('&amp;', '&', $message);
+                $message = str_replace('#038;', '', $message);
             }
             return hash('sha256', $message);
         }
