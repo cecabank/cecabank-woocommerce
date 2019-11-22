@@ -133,6 +133,11 @@ class Client
         $this->setValueDefault($options, 'Cifrado');
         $this->setValueDefault($options, 'Pago_soportado');
         $this->setValueDefault($options, 'Idioma');
+		
+		if ( 'yes' === get_option( 'woocommerce_force_ssl_checkout' ) || is_ssl() ) {
+            $options['URL_OK'] = str_replace( 'http:', 'https:', $options['URL_OK'] );
+            $options['URL_NOK'] = str_replace( 'http:', 'https:', $options['URL_NOK'] );
+        }
 
         $this->setValue($options, 'Num_operacion');
         $this->setValue($options, 'Importe');
@@ -357,7 +362,6 @@ class Client
         if ($this->options['Cifrado'] === 'SHA2') {
             if ( $replace ) {
                 $message = str_replace('&amp;', '&', $message);
-                $message = str_replace('#038;', '', $message);
             }
             return hash('sha256', $message);
         }
