@@ -303,14 +303,9 @@ function wc_cecabank_gateway_init() {
          * @return array
          */
         public function process_payment( $order_id ) {
-
             $order = wc_get_order( $order_id );
 
-            if ( version_compare( WOOCOMMERCE_VERSION, '2.1', '<' ) ) {
-                $redirect_url = add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(woocommerce_get_page_id('pay'))));
-            } else {
-                $redirect_url = $order->get_checkout_payment_url( true );
-            }
+			$redirect_url = add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(wc_get_page_id('pay'))));
 
             return array(
                     'result'        => 'success',
@@ -523,13 +518,16 @@ function wc_cecabank_gateway_init() {
                     'PAYMENT_ACC_AGE' => $registered
                 )
             );
+			
+			$order_received_url = wc_get_endpoint_url( 'order-received', $order->get_id(), wc_get_page_permalink( 'checkout' ) );
+			$order_received_url = add_query_arg( 'key', $order->get_order_key(), $order_received_url );
 
             // Create transaction
             $cecabank_client->setFormHiddens(array(
                 'Num_operacion' => $order_id,
                 'Descripcion' => __('Pago del pedido ', 'wc-gateway-cecabank').$order_id,
                 'Importe' => $order->get_total(),
-                'URL_OK' => $this->get_return_url( $order ),
+                'URL_OK' => $order_received_url,
                 'URL_NOK' => $order->get_cancel_order_url(),
                 'datos_acs_20' => urlencode( json_encode( $acs ) )
             ));
