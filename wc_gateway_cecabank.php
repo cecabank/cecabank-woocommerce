@@ -83,7 +83,7 @@ function wc_cecabank_gateway_init() {
         public function __construct() {
 
             $this->id                 = 'cecabank_gateway';
-            $this->icon               = apply_filters( 'woocommerce_cecabank_icon', plugins_url( 'assets/images/icons/cecabank.png' , __FILE__ ) );
+            $this->icon               = "https://pgw.ceca.es/TPVvirtual/images/logo".$this->get_option( 'acquirer', '400000001' ).".gif";
             $this->has_fields         = false;
             $this->method_title       = __( 'Cecabank', 'wc-gateway-cecabank' );
             $this->method_description = __( 'Permite utilizar la pasarela de Cecabank en tu sitio web.', 'wc-gateway-cecabank' );
@@ -106,7 +106,14 @@ function wc_cecabank_gateway_init() {
             $this->set_completed = $this->get_option( 'set_completed', 'N' );
             $this->environment = $this->get_option( 'environment', 'test' );
             $this->currency = $this->get_option( 'currency', '978' );
-            $this->icon = "https://pgw.ceca.es/TPVvirtual/images/logo".$this->get_option( 'acquirer' ).".gif";
+
+            $icon = $this->get_option( 'icon', $this->icon );
+            if (strpos($icon, 'assets/images/icons/cecabank.png') === false) {
+                $this->icon = $icon;
+            } else {
+                $this->update_option( 'icon', $this->icon );
+            }
+            
 
             // Actions
             add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -282,6 +289,12 @@ function wc_cecabank_gateway_init() {
                         '949' => __( 'TRY', 'wc-gateway-cecabank' ),
                     ),
                     'default'     => '978'
+                ),
+                'icon' => array(
+                    'title'   => __( 'Icon', 'wc-gateway-cecabank' ),
+                    'type'    => 'text',
+                    'label'   => __( 'Url de la imagen a mostrar en la página de pago', 'wc-gateway-cecabank' ),
+                    'default' => apply_filters( 'woocommerce_cecabank_icon', $this->icon )
                 ),
             ) );
         }
