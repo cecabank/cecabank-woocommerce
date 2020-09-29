@@ -342,11 +342,11 @@ function wc_cecabank_gateway_init() {
             // Mark as on-hold (we're awaiting the payment)
             // $order->update_status( 'on-hold', __( 'Esperando la confirmación del pago por Cecabank', 'wc-gateway-cecabank' ) );
 
-            if ( version_compare( WOOCOMMERCE_VERSION, '2.0', '<' ) ) {
-                $woocommerce->cart->empty_cart();
-            } else {
-                WC()->cart->empty_cart();
-            }
+            // if ( version_compare( WOOCOMMERCE_VERSION, '2.0', '<' ) ) {
+            //     $woocommerce->cart->empty_cart();
+            // } else {
+            //     WC()->cart->empty_cart();
+            // }
         }
 
 
