@@ -83,7 +83,7 @@ function wc_cecabank_gateway_init() {
         public function __construct() {
 
             $this->id                 = 'cecabank_gateway';
-            $this->icon               = "https://pgw.ceca.es/TPVvirtual/images/logo".$this->get_option( 'acquirer', '400000001' ).".gif";
+            $this->icon               = "https://pgw.ceca.es/TPVvirtual/images/logo".$this->get_option( 'acquirer', '0000554000' ).".gif";
             $this->has_fields         = false;
             $this->method_title       = __( 'Cecabank', 'wc-gateway-cecabank' );
             $this->method_description = __( 'Permite utilizar la pasarela de Cecabank en tu sitio web.', 'wc-gateway-cecabank' );
@@ -108,10 +108,11 @@ function wc_cecabank_gateway_init() {
             $this->currency = $this->get_option( 'currency', '978' );
 
             $icon = $this->get_option( 'icon', $this->icon );
-            if (strpos($icon, 'assets/images/icons/cecabank.png') === false) {
-                $this->icon = $icon;
-            } else {
+            if (strpos($icon, 'assets/images/icons/cecabank.png') !== false || 
+                ($this->acquirer !== '0000554000' && $icon === "https://pgw.ceca.es/TPVvirtual/images/logo0000554000.gif") ) {
                 $this->update_option( 'icon', $this->icon );
+            } else {
+                $this->icon = $icon;
             }
             
 
