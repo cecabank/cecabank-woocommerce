@@ -5,7 +5,7 @@
  * Description: Plugin de WooCommerce para conectar con la pasarela de Cecabank.
  * Author: Cecabank, S.A.
  * Author URI: https://www.cecabank.es/
- * Version: 0.1.7
+ * Version: 0.1.8
  * Text Domain: wc_cecabank
  * Domain Path: /i18n/languages/
  *
@@ -69,7 +69,7 @@ try {
  *
  * @class 		WC_Gateway_Cecabank
  * @extends		WC_Payment_Gateway
- * @version		0.1.7
+ * @version		0.1.8
  * @package		WooCommerce/Classes/Payment
  * @author 		Cecabank, S.A.
  */
@@ -136,7 +136,46 @@ function wc_cecabank_gateway_init() {
             add_action( 'woocommerce_receipt_cecabank_gateway', array( $this, 'receipt_page' ) );
         }
 
-        function get_client_config() {
+        function get_client_config() {$lang = '1';
+            $locale = get_locale();
+            if ($locale) {
+                $locale = substr($locale, 0, 2);
+            }
+            switch ($locale) {
+                case 'en':
+                    $lang = '6';
+                    break;
+                case 'fr':
+                    $lang = '7';
+                    break;
+                case 'de':
+                    $lang = '8';
+                    break;
+                case 'pt':
+                    $lang = '9';
+                    break;
+                case 'it':
+                    $lang = '10';
+                    break;
+                case 'ru':
+                    $lang = '14';
+                    break;
+                case 'no':
+                    $lang = '15';
+                    break;
+                case 'ca':
+                    $lang = '2';
+                    break;
+                case 'eu':
+                    $lang = '3';
+                    break;
+                case 'gl':
+                    $lang = '4';
+                    break;
+                default:
+                    $lang = '1';
+                    break;
+            }
             return array(
                 'Environment' => $this->environment,
                 'MerchantID' => $this->merchant,
@@ -146,7 +185,7 @@ function wc_cecabank_gateway_init() {
                 'TipoMoneda' => $this->currency,
                 'Exponente' => '2',
                 'Cifrado' => 'SHA2',
-                'Idioma' => '1',
+                'Idioma' => $lang,
                 'Pago_soportado' => 'SSL'
             );
         }
