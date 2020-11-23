@@ -662,9 +662,10 @@ function wc_cecabank_gateway_init() {
                 $cecabank_client->checkTransaction($_POST);
             } catch (\Exception $e) {
                 $message = __('Ha ocurrido un error con el pago: '.$e->getMessage(), 'wc-gateway-cecabank');
-                $order = wc_get_order( $_POST['Num_operacion'] );
-                $order->update_status('failed', $message );
-                die();
+                if(isset($_POST['Num_operacion']) && $order = wc_get_order( $_POST['Num_operacion'] )) {
+                    $order->update_status('failed', $message );
+                }
+                die($message);
             }
 
             $order = wc_get_order( $_POST['Num_operacion'] );
