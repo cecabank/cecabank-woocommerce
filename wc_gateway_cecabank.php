@@ -359,7 +359,7 @@ function wc_cecabank_gateway_init() {
         public function process_payment( $order_id ) {
             $order = wc_get_order( $order_id );
 
-			$redirect_url = add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(wc_get_page_id('pay'))));
+			$redirect_url = add_query_arg('order', $order->get_id(), add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('pay'))));
 
             return array(
                     'result'        => 'success',
