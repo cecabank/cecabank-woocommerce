@@ -347,6 +347,12 @@ function wc_cecabank_gateway_init() {
             if ( $this->thank_you_text ) {
                 echo wpautop( wptexturize( $this->thank_you_text ) );
             }
+
+            if ( version_compare( WOOCOMMERCE_VERSION, '2.0', '<' ) ) {
+                $woocommerce->cart->empty_cart();
+            } else {
+                WC()->cart->empty_cart();
+            }
         }
 
 
