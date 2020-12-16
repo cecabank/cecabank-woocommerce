@@ -417,7 +417,6 @@ function wc_cecabank_gateway_init() {
             $country = '';
             $line1 = '';
             $line2 = '';
-            $line3 = '';
             $postal_code = '';
             $state = '';
             $phone = '';
@@ -426,7 +425,6 @@ function wc_cecabank_gateway_init() {
             $ship_country = '';
             $ship_line1 = '';
             $ship_line2 = '';
-            $ship_line3 = '';
             $ship_postal_code = '';
             $ship_state = '';
             if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '<' ) ) {
@@ -513,65 +511,156 @@ function wc_cecabank_gateway_init() {
             $utc_offset = intval( get_option( 'gmt_offset', 0 ) );
             $utc_offset *= 60;
 
-            $acs = array(
-                'CARDHOLDER'        => array(
-                    'NAME'          => $name,
-                    'EMAIL'         => $email,
-                    'BILL_ADDRESS'  => array(
-                        'CITY'      => $city,
-                        'COUNTRY'   => $country,
-                        'LINE1'     => $line1,
-                        'LINE2'     => $line2,
-                        'LINE3'     => $line3,
-                        'POST_CODE' => $postal_code,
-                        'STATE'     => $state
-                    ),
-                ),
-                'PURCHASE'          => array(
-                    'SHIP_ADDRESS'  => array(
-                        'CITY'      => $ship_city,
-                        'COUNTRY'   => $ship_country,
-                        'LINE1'     => $ship_line1,
-                        'LINE2'     => $ship_line2,
-                        'LINE3'     => $ship_line3,
-                        'POST_CODE' => $ship_postal_code,
-                        'STATE'     => $ship_state
-                    ),
-                    'MOBILE_PHONE'  => array(
-                        'CC'        => '',
-                        'SUBSCRIBER'=> $phone
-                    ),
-                    'WORK_PHONE'    => array(
-                        'CC'        => '',
-                        'SUBSCRIBER'=> ''
-                    ),
-                    'HOME_PHONE'    => array(
-                        'CC'        => '',
-                        'SUBSCRIBER'=> ''
-                    ),
-                ),
-                'MERCHANT_RISK_IND' => array(
-                    'SHIP_INDICATOR'=> $ship_indicator,
-                    'DELIVERY_TIMEFRAME' => $delivery_time_frame,
-                    'DELIVERY_EMAIL_ADDRESS' => $delivery_email,
-                    'REORDER_ITEMS_IND' => $reorder_items,
-                    'PRE_ORDER_PURCHASE_IND' => 'AVAILABLE',
-                    'PRE_ORDER_DATE'=> '',
-                ),
-                'ACCOUNT_INFO'      => array(
-                    'CH_ACC_AGE_IND'=> $user_age,
-                    'CH_ACC_CHANGE_IND' => $user_info_age,
-                    'CH_ACC_CHANGE' => $registered,
-                    'CH_ACC_DATE'   => $registered,
-                    'TXN_ACTIVITY_DAY' => $txn_activity_today,
-                    'TXN_ACTIVITY_YEAR' => $txn_activity_year,
-                    'NB_PURCHASE_ACCOUNT' => $txn_purchase_6,
-                    'SUSPICIOUS_ACC_ACTIVITY' => 'NO_SUSPICIOUS',
-                    'SHIP_NAME_INDICATOR' => $ship_name_indicator,
-                    'PAYMENT_ACC_IND' => $user_age,
-                    'PAYMENT_ACC_AGE' => $registered
-                )
+            // ACS
+            $acs = array();
+
+            // Cardholder
+            $cardholder = array();
+            $add_cardholder = false;
+
+            // Cardholder bill address
+            $bill_address = array();
+            $add_bill_address = false;
+            if ($city) {
+                $bill_address['CITY'] = $city;
+                $add_bill_address = true;
+            }                
+            if ($country) {
+                $bill_address['COUNTRY'] = $country;
+                $add_bill_address = true;
+            }
+            if ($line1) {
+                $bill_address['LINE1'] = $line1;
+                $add_bill_address = true;
+            }                
+            if ($line2) {
+                $bill_address['LINE2'] = $line2;
+                $add_bill_address = true;
+            }
+            if ($postal_code) {
+                $bill_address['POST_CODE'] = $postal_code;
+                $add_bill_address = true;
+            }                
+            if ($state) {
+                $bill_address['STATE'] = $state;
+                $add_bill_address = true;
+            }
+            if ($add_bill_address) {
+                $cardholder['BILL_ADDRESS'] = $bill_address;
+                $add_cardholder = true;
+            }
+
+            // Cardholder name
+            if ($name) {
+                $cardholder['NAME'] = $name;
+                $add_cardholder = true;
+            }
+
+            // Cardholder email
+            if ($email) {
+                $cardholder['EMAIL'] = $email;
+                $add_cardholder = true;
+            }
+
+            if ($add_cardholder) {
+                $acs['CARDHOLDER'] = $cardholder;
+            }
+
+            // Purchase
+            $purchase = array();
+            $add_purchase = true;
+
+            // Purchase ship address
+            $ship_address = array();
+            $add_ship_address = false;
+            if ($ship_city) {
+                $ship_address['CITY'] = $ship_city;
+                $add_ship_address = true;
+            }                
+            if ($ship_country) {
+                $ship_address['COUNTRY'] = $ship_country;
+                $add_ship_address = true;
+            }
+            if ($ship_line1) {
+                $ship_address['LINE1'] = $ship_line1;
+                $add_ship_address = true;
+            }                
+            if ($ship_line2) {
+                $ship_address['LINE2'] = $ship_line2;
+                $add_ship_address = true;
+            }
+            if ($ship_postal_code) {
+                $ship_address['POST_CODE'] = $ship_postal_code;
+                $add_ship_address = true;
+            }                
+            if ($ship_state) {
+                $ship_address['STATE'] = $ship_state;
+                $add_ship_address = true;
+            }
+            if ($add_ship_address) {
+                $purchase['SHIP_ADDRESS'] = $ship_address;
+                $add_purchase = true;
+            }
+
+            // Purchase mobile phone
+            if ($phone) {
+                $purchase['MOBILE_PHONE'] = array(
+                    'SUBSCRIBER' => $phone
+                );
+                $add_purchase = true;
+            }
+
+            if ($add_purchase) {
+                $acs['PURCHASE'] = $purchase;
+            }
+
+            // Merchant risk
+            $merchant_risk = array(
+                'PRE_ORDER_PURCHASE_IND' => 'AVAILABLE'
             );
+            if ($ship_indicator) {
+                $merchant_risk['SHIP_INDICATOR'] = $ship_indicator;
+            }
+            if ($delivery_time_frame) {
+                $merchant_risk['DELIVERY_TIMEFRAME'] = $delivery_time_frame;
+            }
+            if ($delivery_email) {
+                $merchant_risk['DELIVERY_EMAIL_ADDRESS'] = $delivery_email;
+            }
+            if ($reorder_items) {
+                $merchant_risk['REORDER_ITEMS_IND'] = $reorder_items;
+            }
+            $acs['MERCHANT_RISK_IND'] = $merchant_risk;
+
+            // Account info
+            $account_info = array(
+                'SUSPICIOUS_ACC_ACTIVITY' => 'NO_SUSPICIOUS'
+            );
+            if ($user_age) {
+                $account_info['CH_ACC_AGE_IND'] = $user_age;
+                $account_info['PAYMENT_ACC_IND'] = $user_age;
+            }
+            if ($user_info_age) {
+                $account_info['CH_ACC_CHANGE_IND'] = $user_info_age;
+            }
+            if ($registered) {
+                $account_info['CH_ACC_CHANGE'] = $registered;
+                $account_info['CH_ACC_DATE'] = $registered;
+                $account_info['PAYMENT_ACC_AGE'] = $registered;
+            }
+            if ($txn_activity_today) {
+                $account_info['TXN_ACTIVITY_DAY'] = $txn_activity_today;
+            }
+            if ($txn_activity_year) {
+                $account_info['TXN_ACTIVITY_YEAR'] = $txn_activity_year;
+            }
+            if ($txn_purchase_6) {
+                $account_info['NB_PURCHASE_ACCOUNT'] = $txn_purchase_6;
+            }
+            if ($ship_name_indicator) {
+                $account_info['SHIP_NAME_INDICATOR'] = $ship_name_indicator;
+            }
+            $acs['ACCOUNT_INFO'] = $account_info;
 			
 			$order_received_url = wc_get_endpoint_url( 'order-received', $order->get_id(), wc_get_page_permalink( 'checkout' ) );
 			$order_received_url = add_query_arg( 'key', $order->get_order_key(), $order_received_url );
