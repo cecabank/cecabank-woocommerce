@@ -5,7 +5,7 @@
  * Description: Plugin de WooCommerce para conectar con la pasarela de Cecabank.
  * Author: Cecabank, S.A.
  * Author URI: https://www.cecabank.es/
- * Version: 0.1.9
+ * Version: 0.2.0
  * Text Domain: wc_cecabank
  * Domain Path: /i18n/languages/
  *
@@ -69,7 +69,7 @@ try {
  *
  * @class 		WC_Gateway_Cecabank
  * @extends		WC_Payment_Gateway
- * @version		0.1.9
+ * @version		0.2.0
  * @package		WooCommerce/Classes/Payment
  * @author 		Cecabank, S.A.
  */
@@ -186,7 +186,8 @@ function wc_cecabank_gateway_init() {
                 'Exponente' => '2',
                 'Cifrado' => 'SHA2',
                 'Idioma' => $lang,
-                'Pago_soportado' => 'SSL'
+                'Pago_soportado' => 'SSL',
+                'versionMod' => 'W-0.2.0'
             );
         }
 
@@ -682,7 +683,7 @@ function wc_cecabank_gateway_init() {
                 'Importe' => $order->get_total(),
                 'URL_OK' => $order_received_url,
                 'URL_NOK' => $order->get_cancel_order_url(),
-                'datos_acs_20' => urlencode( json_encode( $acs ) )
+                'datos_acs_20' => base64_encode( str_replace( '[]', '{}', json_encode( $acs ) ) )
             ));
 
             echo '<form id="cecabank-form" action="'.$cecabank_client->getPath().'" method="post">'.$cecabank_client->getFormHiddens().'</form>'.'<script>document.getElementById("cecabank-form").submit();</script>';
