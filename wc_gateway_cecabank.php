@@ -682,7 +682,7 @@ function wc_cecabank_gateway_init() {
                 'Descripcion' => __('Pago del pedido ', 'wc-gateway-cecabank').$order_id,
                 'Importe' => $order->get_total(),
                 'URL_OK' => $order_received_url,
-                'URL_NOK' => $order->get_cancel_order_url(),
+                'URL_NOK' => apply_filters('cecabank_url_no_ok',$order->get_cancel_order_url()),
                 'datos_acs_20' => base64_encode( str_replace( '[]', '{}', json_encode( $acs ) ) )
             ));
 
