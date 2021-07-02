@@ -17,6 +17,33 @@ class Client
         'versionMod' => ''
     );
 
+    private $currencies = array(
+        'EUR' => '978',
+        'AUD' => '36',
+        'CAD' => '124',
+        'CNY' => '156',
+        'CZK' => '203',
+        'DKK' => '208',
+        'JPY' => '392',
+        'MXN' => '484',
+        'NOK' => '578',
+        'RUB' => '643',
+        'SEK' => '752',
+        'CHF' => '756',
+        'GBP' => '826',
+        'USD' => '840',
+        'RON' => '946',
+        'PLN' => '985',
+        'ARS' => '32' ,
+        'CLP' => '152',
+        'COP' => '170',
+        'INR' => '356',
+        'PEN' => '604',
+        'BRL' => '986',
+        'VEF' => '937',
+        'TRY' => '949',
+    );
+
     private $o_required = array('Environment', 'ClaveCifrado', 'MerchantID', 'AcquirerBIN', 'TerminalID', 'TipoMoneda', 'Exponente', 'Cifrado', 'Pago_soportado');
     private $o_optional = array('Idioma', 'Descripcion', 'URL_OK', 'URL_NOK', 'Tipo_operacion', 'Datos_operaciones', 'PAN', 'Caducidad', 'CVV2', 'Pago_elegido', 'versionMod');
 
@@ -120,6 +147,13 @@ class Client
         return $key ? $this->refund_environments[$key] : $this->refund_environments;
     }
 
+    public function getCurrencyCode(string $currency) {
+        if (isset($currencies[$currency])) {
+            return $currencies[$currency];
+        }
+        return '978';
+    }
+
     public function setFormHiddens(array $options)
     {
         $this->hidden = $this->values = array();
@@ -141,6 +175,7 @@ class Client
             $options['URL_NOK'] = str_replace( 'http:', 'https:', $options['URL_NOK'] );
         }
 
+        $this->setValue($options, 'TipoMoneda');
         $this->setValue($options, 'Num_operacion');
         $this->setValue($options, 'Importe');
         $this->setValue($options, 'URL_OK');
@@ -183,6 +218,7 @@ class Client
         $this->setValueDefault($options, 'Cifrado');
         $this->setValueDefault($options, 'Idioma');
 
+        $this->setValue($options, 'TipoMoneda');
         $this->setValue($options, 'Num_operacion');
         $this->setValue($options, 'Importe');
         $this->setValue($options, 'Referencia');

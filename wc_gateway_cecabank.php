@@ -105,7 +105,6 @@ function wc_cecabank_gateway_init() {
             $this->thank_you_text = $this->get_option( 'thank_you_text', '' );
             $this->set_completed = $this->get_option( 'set_completed', 'N' );
             $this->environment = $this->get_option( 'environment', 'test' );
-            $this->currency = $this->get_option( 'currency', '978' );
 
             $icon = $this->get_option( 'icon', $this->icon );
             if (strpos($icon, 'assets/images/icons/cecabank.png') !== false || 
@@ -182,7 +181,6 @@ function wc_cecabank_gateway_init() {
                 'AcquirerBIN' => $this->acquirer,
                 'TerminalID' => $this->terminal,
                 'ClaveCifrado' => $this->secret_key,
-                'TipoMoneda' => $this->currency,
                 'Exponente' => '2',
                 'Cifrado' => 'SHA2',
                 'Idioma' => $lang,
@@ -306,30 +304,6 @@ function wc_cecabank_gateway_init() {
                         'real' => __( 'Real', 'wc-gateway-cecabank' ),
                     ),
                     'default'     => 'test'
-                ),
-                'currency' => array(
-                    'title'       => __( 'Moneda', 'wc-gateway-cecabank' ),
-                    'type'        => 'select',
-                    'description' => __( 'Moneda a utilizar en las transacciones.', 'wc-gateway-cecabank' ),
-                    'desc_tip'    => false,
-                    'options'     => array(
-                        '978' => __( 'EUR', 'wc-gateway-cecabank' ),
-                        '840' => __( 'USD', 'wc-gateway-cecabank' ),
-                        '826' => __( 'GBP', 'wc-gateway-cecabank' ),
-                        '392' => __( 'JPY', 'wc-gateway-cecabank' ),
-                        '32'  => __( 'ARS', 'wc-gateway-cecabank' ),
-                        '124' => __( 'CAD', 'wc-gateway-cecabank' ),
-                        '152' => __( 'CLP', 'wc-gateway-cecabank' ),
-                        '170' => __( 'COP', 'wc-gateway-cecabank' ),
-                        '356' => __( 'INR', 'wc-gateway-cecabank' ),
-                        '484' => __( 'MXN', 'wc-gateway-cecabank' ),
-                        '604' => __( 'PEN', 'wc-gateway-cecabank' ),
-                        '756' => __( 'CHF', 'wc-gateway-cecabank' ),
-                        '986' => __( 'BRL', 'wc-gateway-cecabank' ),
-                        '937' => __( 'VEF', 'wc-gateway-cecabank' ),
-                        '949' => __( 'TRY', 'wc-gateway-cecabank' ),
-                    ),
-                    'default'     => '978'
                 ),
                 'icon' => array(
                     'title'   => __( 'Icon', 'wc-gateway-cecabank' ),
@@ -683,6 +657,7 @@ function wc_cecabank_gateway_init() {
                 'Importe' => $order->get_total(),
                 'URL_OK' => $order_received_url,
                 'URL_NOK' => $order->get_cancel_order_url(),
+                'TipoMoneda' => $cecabank_client->getCurrencyCode(get_woocommerce_currency()),
                 'datos_acs_20' => base64_encode( str_replace( '[]', '{}', json_encode( $acs ) ) )
             ));
 
@@ -713,9 +688,14 @@ function wc_cecabank_gateway_init() {
             }
 
             try {
+                $config = $this-> get_client_config();
+
+                $cecabank_client = new Cecabank\Client($config);
+
                 $refund_data = array(
                     'Num_operacion' => $order_id,
-                    'Referencia' => $transaction_id
+                    'Referencia' => $transaction_id,
+                    'TipoMoneda' => $cecabank_client->getCurrencyCode(get_woocommerce_currency())
                 );
 
                 // If the amount is set, refund that amount, otherwise the entire amount is refunded
@@ -727,10 +707,6 @@ function wc_cecabank_gateway_init() {
                 } else {
                     $refund_data['Importe'] = $order->get_total();
                 }
-
-                $config = $this-> get_client_config();
-
-                $cecabank_client = new Cecabank\Client($config);
 
                 return $cecabank_client->refund($refund_data);
             } catch ( Exception $e ) {
