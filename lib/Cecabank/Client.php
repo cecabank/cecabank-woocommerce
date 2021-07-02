@@ -147,9 +147,9 @@ class Client
         return $key ? $this->refund_environments[$key] : $this->refund_environments;
     }
 
-    public function getCurrencyCode(string $currency) {
-        if (isset($currencies[$currency])) {
-            return $currencies[$currency];
+    public function getCurrencyCode($currency) {
+        if (isset($this->currencies[$currency])) {
+            return $this->currencies[$currency];
         }
         return '978';
     }
