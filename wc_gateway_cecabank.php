@@ -88,6 +88,7 @@ function wc_cecabank_gateway_init() {
             $this->method_title       = __( 'Cecabank', 'wc-gateway-cecabank' );
             $this->method_description = __( 'Permite utilizar la pasarela de Cecabank en tu sitio web.', 'wc-gateway-cecabank' );
             $this->supports           = array(
+                'subscriptions',
                 'refunds'
             );
 
@@ -412,6 +413,7 @@ function wc_cecabank_gateway_init() {
             $ship_line2 = '';
             $ship_postal_code = '';
             $ship_state = '';
+            $date_created = '';
             if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '<' ) ) {
                 $email = $order->billing_email;
                 $ip = $order->customer_ip_address;
@@ -428,6 +430,7 @@ function wc_cecabank_gateway_init() {
                 $ship_line2 = $order->shipping_address_2;
                 $ship_postal_code = $order->shipping_postcode;
                 $ship_state = $order->shipping_state;
+                $date_created = $order->date_created;
 
                 $user = $order->user;
                 $user_id = $order->user_id;
@@ -447,6 +450,7 @@ function wc_cecabank_gateway_init() {
                 $ship_line2 = $order->get_shipping_address_2();
                 $ship_postal_code = $order->get_shipping_postcode();
                 $ship_state = $order->get_shipping_state();
+                $date_created = $order->get_date_created();
 
                 $user = $order->get_user();
                 $user_id = $order->get_user_id();
@@ -650,8 +654,7 @@ function wc_cecabank_gateway_init() {
 			$order_received_url = wc_get_endpoint_url( 'order-received', $order->get_id(), wc_get_page_permalink( 'checkout' ) );
 			$order_received_url = add_query_arg( 'key', $order->get_order_key(), $order_received_url );
 
-            // Create transaction
-            $cecabank_client->setFormHiddens(array(
+            $hiddens = array(
                 'Num_operacion' => $order_id,
                 'Descripcion' => __('Pago del pedido ', 'wc-gateway-cecabank').$order_id,
                 'Importe' => $order->get_total(),
@@ -659,7 +662,29 @@ function wc_cecabank_gateway_init() {
                 'URL_NOK' => $order->get_cancel_order_url(),
                 'TipoMoneda' => $cecabank_client->getCurrencyCode(get_woocommerce_currency()),
                 'datos_acs_20' => base64_encode( str_replace( '[]', '{}', json_encode( $acs ) ) )
-            ));
+            );
+
+            if( class_exists( 'WC_Subscriptions_Order' ) && WC_Subscriptions_Order::order_contains_subscription( $order_id ) ) {
+                $period = WC_Subscriptions_Order::get_subscription_period( $order );
+                $duration = WC_Subscriptions_Order::get_subscription_interval( $order );
+                $price = WC_Subscriptions_Order::get_recurring_total( $order );
+                $number_of_payments = WC_Subscriptions_Order::get_subscription_length( $order );
+                if ($period == 'year') 
+                    $duration *= 12;
+                    $number_of_payments *= 12;
+                }
+                if ($number_of_payments == 0) {
+                    $number_of_payments = 9999;
+                }
+                $first_payment_date = date_i18n( 'Ymd', strtotime( $date_created ) );
+                $data = $first_payment_date.sprintf("%10d", $price * 100).sprintf("%4d", $number_of_payments).sprintf("%02d", $duration);
+                $hiddens['Descripcion'] = __('Suscripción del pedido ', 'wc-gateway-cecabank').$order_id;
+                $hiddens['Tipo_operacion'] = 'D';
+                $hiddens['Datos_operaciones'] = $data;
+            }
+
+            // Create transaction
+            $cecabank_client->setFormHiddens($hiddens);
 
             echo '<form id="cecabank-form" action="'.$cecabank_client->getPath().'" method="post">'.$cecabank_client->getFormHiddens().'</form>'.'<script>document.getElementById("cecabank-form").submit();</script>';
         }
