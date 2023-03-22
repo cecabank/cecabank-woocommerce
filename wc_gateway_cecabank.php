@@ -669,7 +669,7 @@ function wc_cecabank_gateway_init() {
                 $duration = WC_Subscriptions_Order::get_subscription_interval( $order );
                 $price = WC_Subscriptions_Order::get_recurring_total( $order );
                 $number_of_payments = WC_Subscriptions_Order::get_subscription_length( $order );
-                if ($period == 'year') 
+                if ($period == 'year') {
                     $duration *= 12;
                     $number_of_payments *= 12;
                 }
