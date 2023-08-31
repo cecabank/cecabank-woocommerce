@@ -328,11 +328,17 @@ class Client
             return '000';
         }
 
-        if (preg_match('/[\.,]/', $amount)) {
-            return str_replace(array('.', ','), '', $amount);
+        if(is_string($amount)) {
+            // delete current thousand separator (if exists) from string based on WooCommerce(v2.3+) settings.
+            $amount = str_replace( wc_get_price_thousand_separator(), '', $amount );
+            // replace current decimal separator (if exists) from string based on WooCommerce(v2.3+) settings with a dot.
+            $amount = str_replace( wc_get_price_decimal_separator(), '.', $amount );
         }
+        // convert to cents.
+        $amount = (float) $amount;
+        $amount = ceil( $amount * 100 );
 
-        return (string)($amount * 100);
+        return (string) $amount;
     }
 
     public function getSignature()
