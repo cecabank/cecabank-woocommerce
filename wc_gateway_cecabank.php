@@ -21,16 +21,21 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
+use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
+use Automattic\WooCommerce\StoreApi\Schemas\V1\CartItemSchema;
+
 defined( 'ABSPATH' ) or exit;
 // WooCommerce is active
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
     return;
 }
 
+define( 'WC_GATEWAY_CECABANK_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
+define( 'WC_GATEWAY_CECABANK_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
+
 /**
  * Add the gateway to WC Available Gateways
  *
- * @since 1.0.0
  * @param array $gateways all available WC gateways
  * @return array $gateways all WC gateways + cecabank gateway
  */
@@ -88,6 +93,7 @@ function wc_cecabank_gateway_init() {
             $this->method_title       = __( 'Cecabank', 'wc-gateway-cecabank' );
             $this->method_description = __( 'Permite utilizar la pasarela de Cecabank en tu sitio web.', 'wc-gateway-cecabank' );
             $this->supports           = array(
+                'products',
                 'subscriptions',
                 'refunds'
             );
@@ -788,3 +794,34 @@ function wc_cecabank_gateway_init() {
 
     } // end \WC_Gateway_Cecabank class
 }
+
+add_action( 'woocommerce_blocks_loaded', 'extend_store_api' );
+function extend_store_api() {
+    if ( ! function_exists('woocommerce_store_api_register_endpoint_data') ) {
+        return;
+    }
+
+    woocommerce_store_api_register_endpoint_data([
+        'endpoint' => CartItemSchema::IDENTIFIER,
+        'namespace' => 'cecabank_gateway',
+    ]);
+}
+add_action( 'woocommerce_blocks_loaded', 'add_woocommerce_blocks_support' );
+function add_woocommerce_blocks_support() {
+    if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+        require_once dirname(__FILE__) . '/class/WC_Gateway_Cecabank_Blocks_Support.php';
+        add_action(
+            'woocommerce_blocks_payment_method_type_registration',
+            function( PaymentMethodRegistry $payment_method_registry ) {
+                $payment_method_registry->register( new WC_Gateway_Cecabank_Blocks_Support );
+            }
+        );
+    }
+}
+// Declare compatibility with custom order tables for WooCommerce.
+add_action( 'before_woocommerce_init', function() {
+        if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+        }
+    }
+);
