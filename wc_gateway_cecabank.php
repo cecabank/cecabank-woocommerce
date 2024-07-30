@@ -5,7 +5,7 @@
  * Description: Plugin de WooCommerce para conectar con la pasarela de Cecabank.
  * Author: Cecabank, S.A.
  * Author URI: https://www.cecabank.es/
- * Version: 0.3.2
+ * Version: 0.3.3
  * Text Domain: wc_cecabank
  * Domain Path: /i18n/languages/
  *
@@ -73,7 +73,7 @@ try {
  *
  * @class 		WC_Gateway_Cecabank
  * @extends		WC_Payment_Gateway
- * @version		0.3.2
+ * @version		0.3.3
  * @package		WooCommerce/Classes/Payment
  * @author 		Cecabank, S.A.
  */
@@ -191,7 +191,7 @@ function wc_cecabank_gateway_init() {
                 'Cifrado' => 'SHA2',
                 'Idioma' => $lang,
                 'Pago_soportado' => 'SSL',
-                'versionMod' => 'W-0.3.2'
+                'versionMod' => 'W-0.3.3'
             );
         }
 
@@ -681,7 +681,7 @@ function wc_cecabank_gateway_init() {
                 if ($number_of_payments == 0) {
                     $number_of_payments = 9999;
                 }
-                $first_payment_date = date_i18n( 'Ymd', strtotime("+".($duration*30)." day"); );
+                $first_payment_date = date_i18n( 'Ymd', strtotime("+".($duration*30)." day") );
                 $data = $first_payment_date.sprintf("%10d", $price * 100).sprintf("%4d", $number_of_payments).sprintf("%02d", $duration);
                 $hiddens['Descripcion'] = __('Suscripción del pedido ', 'wc-gateway-cecabank').$order_id;
                 $hiddens['Tipo_operacion'] = 'D';
