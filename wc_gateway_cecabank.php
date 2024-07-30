@@ -681,7 +681,7 @@ function wc_cecabank_gateway_init() {
                 if ($number_of_payments == 0) {
                     $number_of_payments = 9999;
                 }
-                $first_payment_date = date_i18n( 'Ymd', strtotime("+1 day") );
+                $first_payment_date = date_i18n( 'Ymd', strtotime("+".($duration*30)." day"); );
                 $data = $first_payment_date.sprintf("%10d", $price * 100).sprintf("%4d", $number_of_payments).sprintf("%02d", $duration);
                 $hiddens['Descripcion'] = __('Suscripción del pedido ', 'wc-gateway-cecabank').$order_id;
                 $hiddens['Tipo_operacion'] = 'D';
