@@ -10,7 +10,7 @@ final class WC_Gateway_Cecabank_Blocks_Support extends AbstractPaymentMethodType
 
 	public function get_payment_method_script_handles() {
 		$asset_path   = WC_GATEWAY_CECABANK_PATH . '/build/zru-blocks/index.asset.php';
-		$version      = '0.3.1';
+		$version      = '0.3.2';
 		$dependencies = [];
 		if ( file_exists( $asset_path ) ) {
 			$asset        = require $asset_path;
