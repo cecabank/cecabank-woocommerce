@@ -81,6 +81,11 @@ try {
 add_action( 'plugins_loaded', 'wc_cecabank_gateway_init', 11 );
 function wc_cecabank_gateway_init() {
     class WC_Gateway_Cecabank extends WC_Payment_Gateway {
+
+        protected 
+            $notify_url, $merchant, $acquirer, $secret_key, 
+            $terminal, $thank_you_text, $set_completed, $environment;
+
         /**
          * Constructor for the gateway.
          */
@@ -363,7 +368,7 @@ function wc_cecabank_gateway_init() {
 
             $order = wc_get_order( $order_id );
 
-            $config = $this-> get_client_config();
+            $config = $this->get_client_config();
 
             $cecabank_client = new Cecabank\Client($config);
 
@@ -718,7 +723,7 @@ function wc_cecabank_gateway_init() {
             }
 
             try {
-                $config = $this-> get_client_config();
+                $config = $this->get_client_config();
 
                 $cecabank_client = new Cecabank\Client($config);
 
@@ -760,7 +765,7 @@ function wc_cecabank_gateway_init() {
         function check_notification() {
             global $woocommerce;
 
-            $config = $this-> get_client_config();
+            $config = $this->get_client_config();
 
             $cecabank_client = new Cecabank\Client($config);
 
@@ -775,7 +780,9 @@ function wc_cecabank_gateway_init() {
 
             $order = wc_get_order( $_POST['Num_operacion'] );
 
-            if ( $order->has_status( 'completed' ) ) {
+            $subscriptions = class_exists( 'WC_Subscriptions_Order' ) && WC_Subscriptions_Order::order_contains_subscription( $order_id );
+
+            if ( !$subscriptions && $order->has_status( 'completed' ) ) {
                 die();
             }
 
@@ -784,7 +791,7 @@ function wc_cecabank_gateway_init() {
             $order->payment_complete( $_POST['Referencia'] );
 
             // Set order as completed if user did set up it
-            if ( 'Y' == $this->set_completed ) {
+            if ( !$order->has_status( 'completed' ) && 'Y' == $this->set_completed ) {
                 $order->update_status( 'completed' );
             }
 

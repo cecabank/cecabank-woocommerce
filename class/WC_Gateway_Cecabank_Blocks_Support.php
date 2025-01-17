@@ -3,6 +3,7 @@ use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodTyp
 
 final class WC_Gateway_Cecabank_Blocks_Support extends AbstractPaymentMethodType {
 	protected $name = 'cecabank_gateway';
+	protected $settings;
 
 	public function initialize() {
 		$this->settings = get_option( 'woocommerce_cecabank_gateway_settings', [] );
