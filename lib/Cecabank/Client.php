@@ -386,8 +386,8 @@ class Client
 
         $signature = $this->makeHash($key);
 
-        if ($signature !== $post['Firma']) {
-            throw new Exception(sprintf('Signature not valid (%s != %s)', $signature, $post['Firma']));
+        if (!hash_equals($signature, $post['Firma'])) {
+            throw new Exception(sprintf('Signature not valid'));
         }
 
         return $post['Firma'];

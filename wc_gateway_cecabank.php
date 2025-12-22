@@ -257,7 +257,7 @@ function wc_cecabank_gateway_init() {
 
                 'secret_key' => array(
                     'title'       => __( 'Clave Secreta', 'wc-gateway-cecabank' ),
-                    'type'        => 'text',
+                    'type'        => 'password',
                     'description' => __( 'Clave secreta dada por Cecabank.', 'wc-gateway-cecabank' ),
                     'default'     => '',
                     'desc_tip'    => true,
@@ -772,9 +772,6 @@ function wc_cecabank_gateway_init() {
             try {
                 $cecabank_client->checkTransaction($_POST);
             } catch (\Exception $e) {
-                $message = __('Ha ocurrido un error con el pago: '.$e->getMessage(), 'wc-gateway-cecabank');
-                $order = wc_get_order( $_POST['Num_operacion'] );
-                $order->update_status('failed', $message );
                 die();
             }
 
