@@ -5,7 +5,7 @@
  * Description: Plugin de WooCommerce para conectar con la pasarela de Cecabank.
  * Author: Cecabank, S.A.
  * Author URI: https://www.cecabank.es/
- * Version: 0.3.5
+ * Version: 0.4.0
  * Text Domain: wc_cecabank
  * Domain Path: /i18n/languages/
  *
@@ -73,7 +73,7 @@ try {
  *
  * @class 		WC_Gateway_Cecabank
  * @extends		WC_Payment_Gateway
- * @version		0.3.5
+ * @version		0.4.0
  * @package		WooCommerce/Classes/Payment
  * @author 		Cecabank, S.A.
  */
@@ -186,6 +186,7 @@ function wc_cecabank_gateway_init() {
                     $lang = '1';
                     break;
             }
+            $cifrado = strlen( (string) $this->secret_key ) === 8 ? 'SHA2' : 'HMAC';
             return array(
                 'Environment' => $this->environment,
                 'MerchantID' => $this->merchant,
@@ -193,10 +194,10 @@ function wc_cecabank_gateway_init() {
                 'TerminalID' => $this->terminal,
                 'ClaveCifrado' => $this->secret_key,
                 'Exponente' => '2',
-                'Cifrado' => 'SHA2',
+                'Cifrado' => $cifrado,
                 'Idioma' => $lang,
                 'Pago_soportado' => 'SSL',
-                'versionMod' => 'W-0.3.5'
+                'versionMod' => 'W-0.4.0'
             );
         }
 
@@ -258,7 +259,7 @@ function wc_cecabank_gateway_init() {
                 'secret_key' => array(
                     'title'       => __( 'Clave Secreta', 'wc-gateway-cecabank' ),
                     'type'        => 'password',
-                    'description' => __( 'Clave secreta dada por Cecabank.', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Clave secreta dada por Cecabank. Si tiene 8 caracteres se usará el algoritmo SHA2; en otro caso (clave HMAC, normalmente 32 caracteres) se usará HMAC.', 'wc-gateway-cecabank' ),
                     'default'     => '',
                     'desc_tip'    => true,
                 ),
