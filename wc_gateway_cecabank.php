@@ -767,22 +767,35 @@ function wc_cecabank_gateway_init() {
             global $woocommerce;
 
             $config = $this->get_client_config();
-            $config['Cifrado'] = 'SHA2';
 
             $cecabank_client = new Cecabank\Client($config);
 
             try {
                 $cecabank_client->checkTransaction($_POST);
             } catch (\Exception $e) {
+                wc_get_logger()->error(
+                    'Cecabank notification validation failed: ' . $e->getMessage(),
+                    array( 'source' => 'cecabank' )
+                );
+                status_header( 400 );
                 die();
             }
 
             $order = wc_get_order( $_POST['Num_operacion'] );
 
-            $subscriptions = class_exists( 'WC_Subscriptions_Order' ) && WC_Subscriptions_Order::order_contains_subscription( $order_id );
+            if ( !$order ) {
+                wc_get_logger()->error(
+                    'Cecabank notification references an unknown order.',
+                    array( 'source' => 'cecabank' )
+                );
+                status_header( 404 );
+                die();
+            }
+
+            $subscriptions = class_exists( 'WC_Subscriptions_Order' ) && WC_Subscriptions_Order::order_contains_subscription( $order->get_id() );
 
             if ( !$subscriptions && $order->has_status( 'completed' ) ) {
-                die();
+                die($cecabank_client->successCode());
             }
 
             // Payment completed
