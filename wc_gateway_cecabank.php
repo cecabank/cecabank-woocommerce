@@ -470,8 +470,8 @@ function wc_cecabank_gateway_init() {
                 $user_data = get_userdata( $user->ID );
                 $registered = $user_data->user_registered;
 
-                $diff = strtotime('now') - strtotime($registered);
-                $days = (int)date('d', $diff);
+                $diff = time() - strtotime( $registered );
+                $days = (int) floor( $diff / DAY_IN_SECONDS );
                 if ( $days === 0 ) {
                     $user_age = 'JUST_CHANGED';
                     $user_info_age = 'JUST_CHANGED';
@@ -765,6 +765,10 @@ function wc_cecabank_gateway_init() {
         /**
          * Check for Cecabank notification
          *
+         * Server-to-server request sent by Cecabank once the payment is done. There is
+         * no WordPress nonce for it: the request is authenticated by the "Firma"
+         * signature, which checkTransaction() verifies with the merchant secret key.
+         *
          * @access public
          * @return void
          */
@@ -776,13 +780,28 @@ function wc_cecabank_gateway_init() {
 
             $cecabank_client = new Cecabank\Client($config);
 
+            // phpcs:disable WordPress.Security.NonceVerification.Missing -- signed server-to-server notification, see above.
+            $notification = array();
+            foreach ( array( 'MerchantID', 'AcquirerBIN', 'TerminalID', 'Num_operacion', 'Importe', 'TipoMoneda', 'Exponente', 'Referencia', 'Firma' ) as $field ) {
+                $notification[ $field ] = isset( $_POST[ $field ] ) && is_scalar( $_POST[ $field ] )
+                    ? sanitize_text_field( wp_unslash( $_POST[ $field ] ) )
+                    : '';
+            }
+            // phpcs:enable WordPress.Security.NonceVerification.Missing
+
             try {
-                $cecabank_client->checkTransaction($_POST);
+                $cecabank_client->checkTransaction( $notification );
             } catch (\Exception $e) {
                 die();
             }
 
-            $order = wc_get_order( $_POST['Num_operacion'] );
+            $order_id  = absint( $notification['Num_operacion'] );
+            $reference = $notification['Referencia'];
+            $order     = wc_get_order( $order_id );
+
+            if ( ! $order ) {
+                die();
+            }
 
             $subscriptions = class_exists( 'WC_Subscriptions_Order' ) && WC_Subscriptions_Order::order_contains_subscription( $order_id );
 
@@ -795,10 +814,10 @@ function wc_cecabank_gateway_init() {
                 sprintf(
                     /* translators: %s: Cecabank transaction reference */
                     __( 'Pago completado por Cecabank con referencia: %s', 'cecabank-woocommerce' ),
-                    $_POST['Referencia']
+                    $reference
                 )
             );
-            $order->payment_complete( $_POST['Referencia'] );
+            $order->payment_complete( $reference );
 
             // Set order as completed if user did set up it
             if ( !$order->has_status( 'completed' ) && 'Y' == $this->set_completed ) {
