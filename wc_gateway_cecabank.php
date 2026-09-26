@@ -99,6 +99,12 @@ function wc_cecabank_gateway_init() {
         const SHA2_KEY_LENGTH = 8;
 
         /**
+         * URL of the plugin manual linked from the security notice. Leave empty until the final
+         * URL is available: the notice then shows "Manual plugin" as plain text instead of a link.
+         */
+        const MANUAL_URL = '';
+
+        /**
          * Whether a secret key is a legacy SHA2 key.
          *
          * @param string $key Secret key.
@@ -162,6 +168,9 @@ function wc_cecabank_gateway_init() {
                     self::SHA2_KEY_LENGTH
                 );
 
+            $manual_open  = self::MANUAL_URL ? self::get_notice_link_tag( self::MANUAL_URL ) : '';
+            $manual_close = self::MANUAL_URL ? '</a>' : '';
+
             $list = '<ul class="ul-disc">'
                 . '<li>' . sprintf(
                     /* translators: %1$s: opening link tag to the Cecabank merchant portal, %2$s: closing link tag */
@@ -174,8 +183,8 @@ function wc_cecabank_gateway_init() {
                     esc_html__( '📖 Más información: %1$sBoletín de Seguridad%2$s %3$sManual plugin%4$s', 'cecabank-woocommerce' ),
                     self::get_notice_link_tag( 'https://comercios.ceca.es/docs_constpv/seguridad/TPV_Virtual_Boletin_de_Seguridad_0525_001.pdf' ),
                     '</a>',
-                    self::get_notice_link_tag( '' ),
-                    '</a>'
+                    $manual_open,
+                    $manual_close
                 ) . '</li>'
                 . '</ul>';
 
