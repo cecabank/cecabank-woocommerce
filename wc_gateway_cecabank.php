@@ -5,7 +5,7 @@
  * Description: Plugin de WooCommerce para conectar con la pasarela de Cecabank.
  * Author: Cecabank, S.A.
  * Author URI: https://www.cecabank.es/
- * Version: 0.4.1
+ * Version: 0.4.2
  * Text Domain: cecabank-woocommerce
  *
  * Copyright: (c) 2019 Cecabank, S.A. (tpv@cecabank.es) y WooCommerce
@@ -72,7 +72,7 @@ try {
  *
  * @class 		WC_Gateway_Cecabank
  * @extends		WC_Payment_Gateway
- * @version		0.4.1
+ * @version		0.4.2
  * @package		WooCommerce/Classes/Payment
  * @author 		Cecabank, S.A.
  */
@@ -329,7 +329,7 @@ function wc_cecabank_gateway_init() {
                 'Cifrado' => $cifrado,
                 'Idioma' => $lang,
                 'Pago_soportado' => 'SSL',
-                'versionMod' => 'W-0.4.1'
+                'versionMod' => 'W-0.4.2'
             );
         }
 
