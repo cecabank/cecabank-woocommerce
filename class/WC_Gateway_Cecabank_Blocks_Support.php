@@ -10,7 +10,7 @@ final class WC_Gateway_Cecabank_Blocks_Support extends AbstractPaymentMethodType
 	}
 
 	public function get_payment_method_script_handles() {
-		$asset_path   = WC_GATEWAY_CECABANK_PATH . '/build/zru-blocks/index.asset.php';
+		$asset_path   = WC_GATEWAY_CECABANK_PATH . '/build/cecabank-blocks/index.asset.php';
 		$version      = '0.4.1';
 		$dependencies = [];
 		if ( file_exists( $asset_path ) ) {
@@ -22,6 +22,9 @@ final class WC_Gateway_Cecabank_Blocks_Support extends AbstractPaymentMethodType
 				? $asset['dependencies']
 				: $dependencies;
 		}
+		// The bundle also uses window.wc.wcBlocksRegistry and window.wc.wcSettings, which the
+		// generated asset file does not list (the build has no WooCommerce dependency extraction).
+		$dependencies = array_values( array_unique( array_merge( $dependencies, array( 'wc-blocks-registry', 'wc-settings' ) ) ) );
 		wp_register_script(
 			'wc-cecabank-blocks-integration',
 			WC_GATEWAY_CECABANK_URL . '/build/cecabank-blocks/index.js',
