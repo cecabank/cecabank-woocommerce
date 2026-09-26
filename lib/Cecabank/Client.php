@@ -76,14 +76,14 @@ class Client
         } elseif ($value !== null) {
             $options = array($option => $value);
         } else {
-            throw new Exception(sprintf('Option <strong>%s</strong> can not be empty', $option));
+            throw new Exception(sprintf('Option <strong>%s</strong> can not be empty', esc_html($option)));
         }
 
         $options = array_merge($this->options, $options);
 
         foreach ($this->o_required as $option) {
             if (empty($options[$option])) {
-                throw new Exception(sprintf('Option <strong>%s</strong> is required', $option));
+                throw new Exception(sprintf('Option <strong>%s</strong> is required', esc_html($option)));
             }
 
             $this->options[$option] = $options[$option];
@@ -131,7 +131,7 @@ class Client
     {
         if (empty($this->environments[$key])) {
             $envs = implode('|', array_keys($this->environments));
-            throw new Exception(sprintf('Environment <strong>%s</strong> is not valid [%s]', $key, $envs));
+            throw new Exception(sprintf('Environment <strong>%s</strong> is not valid [%s]', esc_html($key), esc_html($envs)));
         }
 
         return $key ? $this->environments[$key] : $this->environments;
@@ -141,7 +141,7 @@ class Client
     {
         if (empty($this->refund_environments[$key])) {
             $envs = implode('|', array_keys($this->refund_environments));
-            throw new Exception(sprintf('Refund Environment <strong>%s</strong> is not valid [%s]', $key, $envs));
+            throw new Exception(sprintf('Refund Environment <strong>%s</strong> is not valid [%s]', esc_html($key), esc_html($envs)));
         }
 
         return $key ? $this->refund_environments[$key] : $this->refund_environments;
@@ -287,16 +287,21 @@ class Client
         return $this;
     }
 
-    public function getFormHiddens()
+    public function getFormFields()
     {
         if (empty($this->hidden)) {
             throw new Exception('Form fields must be initialized previously');
         }
 
+        return $this->hidden;
+    }
+
+    public function getFormHiddens()
+    {
         $html = '';
 
-        foreach ($this->hidden as $field => $value) {
-            $html .= "\n".'<input type="hidden" name="'.$field.'" value="'.$value.'" />';
+        foreach ($this->getFormFields() as $field => $value) {
+            $html .= "\n".'<input type="hidden" name="'.esc_attr($field).'" value="'.esc_attr($value).'" />';
         }
 
         return trim($html);
@@ -342,7 +347,7 @@ class Client
 
         foreach ($fields as $field) {
             if (!isset($this->values[$field])) {
-                throw new Exception(sprintf('Field <strong>%s</strong> is empty and is required to create signature key', $field));
+                throw new Exception(sprintf('Field <strong>%s</strong> is empty and is required to create signature key', esc_html($field)));
             }
 
             $key .= $this->values[$field];
@@ -358,7 +363,7 @@ class Client
 
         foreach ($fields as $field) {
             if (!isset($this->values[$field])) {
-                throw new Exception(sprintf('Field <strong>%s</strong> is empty and is required to create signature key', $field));
+                throw new Exception(sprintf('Field <strong>%s</strong> is empty and is required to create signature key', esc_html($field)));
             }
 
             $key .= $this->values[$field];
@@ -378,7 +383,7 @@ class Client
 
         foreach ($fields as $field) {
             if (empty($post[$field])) {
-                throw new Exception(sprintf('Field <strong>%s</strong> is empty and is required to verify transaction', $field));
+                throw new Exception(sprintf('Field <strong>%s</strong> is empty and is required to verify transaction', esc_html($field)));
             }
 
             $key .= $post[$field];

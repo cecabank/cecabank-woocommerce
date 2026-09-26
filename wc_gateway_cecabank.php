@@ -6,8 +6,7 @@
  * Author: Cecabank, S.A.
  * Author URI: https://www.cecabank.es/
  * Version: 0.4.1
- * Text Domain: wc_cecabank
- * Domain Path: /i18n/languages/
+ * Text Domain: cecabank-woocommerce
  *
  * Copyright: (c) 2019 Cecabank, S.A. (tpv@cecabank.es) y WooCommerce
  *
@@ -52,7 +51,7 @@ add_filter( 'woocommerce_payment_gateways', 'wc_cecabank_add_to_gateways' );
  */
 function wc_cecabank_gateway_plugin_links( $links ) {
     $plugin_links = array(
-        '<a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=cecabank_gateway' ) . '">' . __( 'Configurar', 'wc-gateway-cecabank' ) . '</a>'
+        '<a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=cecabank_gateway' ) . '">' . __( 'Configurar', 'cecabank-woocommerce' ) . '</a>'
     );
     return array_merge( $plugin_links, $links );
 }
@@ -94,8 +93,8 @@ function wc_cecabank_gateway_init() {
             $this->id                 = 'cecabank_gateway';
             $this->icon               = "https://pgw.ceca.es/TPVvirtual/images/logo".$this->get_option( 'acquirer', '0000554000' ).".gif";
             $this->has_fields         = false;
-            $this->method_title       = __( 'Cecabank', 'wc-gateway-cecabank' );
-            $this->method_description = __( 'Permite utilizar la pasarela de Cecabank en tu sitio web.', 'wc-gateway-cecabank' );
+            $this->method_title       = __( 'Cecabank', 'cecabank-woocommerce' );
+            $this->method_description = __( 'Permite utilizar la pasarela de Cecabank en tu sitio web.', 'cecabank-woocommerce' );
             $this->supports           = array(
                 'products',
                 'subscriptions',
@@ -234,93 +233,93 @@ function wc_cecabank_gateway_init() {
             $this->form_fields = apply_filters( 'wc_cecabank_form_fields', array(
 
                 'enabled' => array(
-                    'title'   => __( 'Habilitar', 'wc-gateway-cecabank' ),
+                    'title'   => __( 'Habilitar', 'cecabank-woocommerce' ),
                     'type'    => 'checkbox',
-                    'label'   => __( 'Habilitar método de pago Cecabank', 'wc-gateway-cecabank' ),
+                    'label'   => __( 'Habilitar método de pago Cecabank', 'cecabank-woocommerce' ),
                     'default' => 'yes'
                 ),
 
                 'merchant' => array(
-                    'title'       => __( 'Código de comercio', 'wc-gateway-cecabank' ),
+                    'title'       => __( 'Código de comercio', 'cecabank-woocommerce' ),
                     'type'        => 'text',
-                    'description' => __( 'Código de comercio dado por Cecabank.', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Código de comercio dado por Cecabank.', 'cecabank-woocommerce' ),
                     'default'     => '',
                     'desc_tip'    => true,
                 ),
 
                 'acquirer' => array(
-                    'title'       => __( 'Adquiriente', 'wc-gateway-cecabank' ),
+                    'title'       => __( 'Adquiriente', 'cecabank-woocommerce' ),
                     'type'        => 'text',
-                    'description' => __( 'Adquiriente dado por Cecabank.', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Adquiriente dado por Cecabank.', 'cecabank-woocommerce' ),
                     'default'     => '',
                     'desc_tip'    => true,
                 ),
 
                 'secret_key' => array(
-                    'title'       => __( 'Clave Secreta', 'wc-gateway-cecabank' ),
+                    'title'       => __( 'Clave Secreta', 'cecabank-woocommerce' ),
                     'type'        => 'password',
-                    'description' => __( 'Clave secreta dada por Cecabank. Si tiene 8 caracteres se usará el algoritmo SHA2; en otro caso (clave HMAC, normalmente 32 caracteres) se usará HMAC.', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Clave secreta dada por Cecabank. Si tiene 8 caracteres se usará el algoritmo SHA2; en otro caso (clave HMAC, normalmente 32 caracteres) se usará HMAC.', 'cecabank-woocommerce' ),
                     'default'     => '',
                     'desc_tip'    => true,
                 ),
 
                 'terminal' => array(
-                    'title'       => __( 'Terminal', 'wc-gateway-cecabank' ),
+                    'title'       => __( 'Terminal', 'cecabank-woocommerce' ),
                     'type'        => 'text',
-                    'description' => __( 'Terminal dada por Cecabank.', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Terminal dada por Cecabank.', 'cecabank-woocommerce' ),
                     'default'     => '',
                     'desc_tip'    => true,
                 ),
 
                 'title' => array(
-                    'title'       => __( 'Título', 'wc-gateway-cecabank' ),
+                    'title'       => __( 'Título', 'cecabank-woocommerce' ),
                     'type'        => 'text',
-                    'description' => __( 'Título mostrado al cliente durante el proceso de compra con este método de pago.', 'wc-gateway-cecabank' ),
-                    'default'     => __( 'Tarjeta', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Título mostrado al cliente durante el proceso de compra con este método de pago.', 'cecabank-woocommerce' ),
+                    'default'     => __( 'Tarjeta', 'cecabank-woocommerce' ),
                     'desc_tip'    => true,
                 ),
 
                 'description' => array(
-                    'title'       => __( 'Descripción', 'wc-gateway-cecabank' ),
+                    'title'       => __( 'Descripción', 'cecabank-woocommerce' ),
                     'type'        => 'textarea',
-                    'description' => __( 'Descripción mostrada al cliente durante el proceso de compra con este método de pago.', 'wc-gateway-cecabank' ),
-                    'default'     => __( 'Paga con tu tarjeta', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Descripción mostrada al cliente durante el proceso de compra con este método de pago.', 'cecabank-woocommerce' ),
+                    'default'     => __( 'Paga con tu tarjeta', 'cecabank-woocommerce' ),
                     'desc_tip'    => true,
                 ),
 
                 'thank_you_text' => array(
-                    'title'       => __( 'Texto de la página de gracias', 'wc-gateway-cecabank' ),
+                    'title'       => __( 'Texto de la página de gracias', 'cecabank-woocommerce' ),
                     'type'        => 'textarea',
-                    'description' => __( 'Texto que se agregará a la página de gracias.', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Texto que se agregará a la página de gracias.', 'cecabank-woocommerce' ),
                     'default'     => '',
                     'desc_tip'    => true,
                 ),
                 'set_completed' => array(
-                    'title'       => __( '¿Marcar el pedido como completado después del pago?', 'wc-gateway-cecabank' ),
+                    'title'       => __( '¿Marcar el pedido como completado después del pago?', 'cecabank-woocommerce' ),
                     'type'        => 'select',
-                    'description' => __( 'Después del pago, ¿debe mostrarse el pedido como completado? Por defecto es "processing".', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Después del pago, ¿debe mostrarse el pedido como completado? Por defecto es "processing".', 'cecabank-woocommerce' ),
                     'desc_tip'    => false,
                     'options'     => array(
-                        'N' => __( 'No', 'wc-gateway-cecabank' ),
-                        'Y' => __( 'Si', 'wc-gateway-cecabank' ),
+                        'N' => __( 'No', 'cecabank-woocommerce' ),
+                        'Y' => __( 'Si', 'cecabank-woocommerce' ),
                     ),
                     'default'     => 'N'
                 ),
                 'environment' => array(
-                    'title'       => __( 'Entorno', 'wc-gateway-cecabank' ),
+                    'title'       => __( 'Entorno', 'cecabank-woocommerce' ),
                     'type'        => 'select',
-                    'description' => __( 'Entorno que se usará al realizar las transacciones.', 'wc-gateway-cecabank' ),
+                    'description' => __( 'Entorno que se usará al realizar las transacciones.', 'cecabank-woocommerce' ),
                     'desc_tip'    => false,
                     'options'     => array(
-                        'test' => __( 'Prueba', 'wc-gateway-cecabank' ),
-                        'real' => __( 'Real', 'wc-gateway-cecabank' ),
+                        'test' => __( 'Prueba', 'cecabank-woocommerce' ),
+                        'real' => __( 'Real', 'cecabank-woocommerce' ),
                     ),
                     'default'     => 'test'
                 ),
                 'icon' => array(
-                    'title'   => __( 'Icon', 'wc-gateway-cecabank' ),
+                    'title'   => __( 'Icon', 'cecabank-woocommerce' ),
                     'type'    => 'text',
-                    'label'   => __( 'Url de la imagen a mostrar en la página de pago', 'wc-gateway-cecabank' ),
+                    'label'   => __( 'Url de la imagen a mostrar en la página de pago', 'cecabank-woocommerce' ),
                     'default' => apply_filters( 'woocommerce_cecabank_icon', $this->icon )
                 ),
             ) );
@@ -332,7 +331,7 @@ function wc_cecabank_gateway_init() {
          */
         public function thankyou_page() {
             if ( $this->thank_you_text ) {
-                echo wpautop( wptexturize( $this->thank_you_text ) );
+                echo wp_kses_post( wpautop( wptexturize( $this->thank_you_text ) ) );
             }
 
             if ( version_compare( WOOCOMMERCE_VERSION, '2.0', '<' ) ) {
@@ -365,7 +364,7 @@ function wc_cecabank_gateway_init() {
         }
 
         function receipt_page( $order_id ) {
-            echo '<p>'.__( 'Redirigiendo a Cecabank.', 'wc-gateway-cecabank' ).'</p>';
+            echo '<p>'.esc_html__( 'Redirigiendo a Cecabank.', 'cecabank-woocommerce' ).'</p>';
 
             $order = wc_get_order( $order_id );
 
@@ -376,7 +375,7 @@ function wc_cecabank_gateway_init() {
             $result = $this->process_regular_payment( $cecabank_client, $order, $order_id );
 
             // Mark as on-hold (we're awaiting the payment)
-            // $order->update_status( 'on-hold', __( 'Esperando la confirmación del pago por Cecabank', 'wc-gateway-cecabank' ) );
+            // $order->update_status( 'on-hold', __( 'Esperando la confirmación del pago por Cecabank', 'cecabank-woocommerce' ) );
 
             // if ( version_compare( WOOCOMMERCE_VERSION, '2.0', '<' ) ) {
             //     $woocommerce->cart->empty_cart();
@@ -667,7 +666,7 @@ function wc_cecabank_gateway_init() {
 
             $hiddens = array(
                 'Num_operacion' => $order_id,
-                'Descripcion' => __('Pago del pedido ', 'wc-gateway-cecabank').$order_id,
+                'Descripcion' => __('Pago del pedido ', 'cecabank-woocommerce').$order_id,
                 'Importe' => $order->get_total(),
                 'URL_OK' => $order_received_url,
                 'URL_NOK' => $order->get_cancel_order_url(),
@@ -689,7 +688,7 @@ function wc_cecabank_gateway_init() {
                 }
                 $first_payment_date = date_i18n( 'Ymd', strtotime("+".($duration*30)." day") );
                 $data = $first_payment_date.sprintf("%10d", $price * 100).sprintf("%4d", $number_of_payments).sprintf("%02d", $duration);
-                $hiddens['Descripcion'] = __('Suscripción del pedido ', 'wc-gateway-cecabank').$order_id;
+                $hiddens['Descripcion'] = __('Suscripción del pedido ', 'cecabank-woocommerce').$order_id;
                 $hiddens['Tipo_operacion'] = 'D';
                 $hiddens['Datos_operaciones'] = $data;
             }
@@ -697,7 +696,11 @@ function wc_cecabank_gateway_init() {
             // Create transaction
             $cecabank_client->setFormHiddens($hiddens);
 
-            echo '<form id="cecabank-form" action="'.$cecabank_client->getPath().'" method="post">'.$cecabank_client->getFormHiddens().'</form>'.'<script>document.getElementById("cecabank-form").submit();</script>';
+            echo '<form id="cecabank-form" action="'.esc_url( $cecabank_client->getPath() ).'" method="post">';
+            foreach ( $cecabank_client->getFormFields() as $field => $value ) {
+                echo '<input type="hidden" name="'.esc_attr( $field ).'" value="'.esc_attr( $value ).'" />';
+            }
+            echo '</form><script>document.getElementById("cecabank-form").submit();</script>';
         }
 
         /**
@@ -717,7 +720,8 @@ function wc_cecabank_gateway_init() {
             if ( ! $transaction_id ) {
                 return new WP_Error( 'cecabank_gateway_wc_refund_error',
                     sprintf(
-                        __( 'Devolución %s falló porque Transaction ID está vacio.', 'wc-gateway-cecabank' ),
+                        /* translators: %s: payment gateway class name */
+                        __( 'Devolución %s falló porque Transaction ID está vacio.', 'cecabank-woocommerce' ),
                         get_class( $this )
                     )
                 );
@@ -747,7 +751,8 @@ function wc_cecabank_gateway_init() {
                 return $cecabank_client->refund($refund_data);
             } catch ( Exception $e ) {
                 $error_message = sprintf(
-                    __( 'Devolución %s fallida', 'wc-gateway-cecabank' ),
+                    /* translators: %s: payment gateway class name */
+                    __( 'Devolución %s fallida', 'cecabank-woocommerce' ),
                     get_class( $this )
                 );
                 $order->add_order_note($error_message);
@@ -786,7 +791,13 @@ function wc_cecabank_gateway_init() {
             }
 
             // Payment completed
-            $order->add_order_note( __('Pago completado por Cecabank con referencia: '.$_POST['Referencia'], 'wc-gateway-cecabank') );
+            $order->add_order_note(
+                sprintf(
+                    /* translators: %s: Cecabank transaction reference */
+                    __( 'Pago completado por Cecabank con referencia: %s', 'cecabank-woocommerce' ),
+                    $_POST['Referencia']
+                )
+            );
             $order->payment_complete( $_POST['Referencia'] );
 
             // Set order as completed if user did set up it
@@ -794,7 +805,7 @@ function wc_cecabank_gateway_init() {
                 $order->update_status( 'completed' );
             }
 
-            die($cecabank_client->successCode());
+            die( esc_html( $cecabank_client->successCode() ) );
         }
 
     } // end \WC_Gateway_Cecabank class
