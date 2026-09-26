@@ -86,6 +86,130 @@ function wc_cecabank_gateway_init() {
             $terminal, $thank_you_text, $set_completed, $environment;
 
         /**
+         * Option where WooCommerce stores this gateway's settings (see WC_Settings_API::get_option_key()).
+         */
+        const SETTINGS_OPTION = 'woocommerce_cecabank_gateway_settings';
+
+        /**
+         * Length of the legacy secret keys. A key of exactly this length signs with SHA-256 ("SHA2");
+         * any other length is treated as an HMAC key. This is the single place where that rule lives:
+         * get_client_config() uses it to sign and the admin notices use it to warn merchants that
+         * still have the short key configured.
+         */
+        const SHA2_KEY_LENGTH = 8;
+
+        /**
+         * Whether a secret key is a legacy SHA2 key.
+         *
+         * @param string $key Secret key.
+         * @return bool
+         */
+        public static function is_sha2_key( $key ) {
+            return strlen( (string) $key ) === self::SHA2_KEY_LENGTH;
+        }
+
+        /**
+         * Whether the saved settings contain a legacy SHA2 key, whether or not the gateway is enabled.
+         *
+         * Reads the option directly so it is accurate in the same request that saves the settings form.
+         *
+         * @return bool
+         */
+        public static function has_sha2_key_configured() {
+            $settings = get_option( self::SETTINGS_OPTION, array() );
+            $key      = is_array( $settings ) && isset( $settings['secret_key'] ) ? $settings['secret_key'] : '';
+
+            return self::is_sha2_key( $key );
+        }
+
+        /**
+         * Opening tag of a link that opens in a new tab.
+         *
+         * @param string $url Link URL.
+         * @return string
+         */
+        protected static function get_notice_link_tag( $url ) {
+            return '<a href="' . esc_url( $url ) . '" target="_blank" rel="noopener">';
+        }
+
+        /**
+         * Prints the "update your secret key" notice when the saved key is a legacy SHA2 key.
+         *
+         * @param bool $inline True to keep the notice where it is printed (gateway settings page);
+         *                     false for the global admin notice, which WordPress moves below the page title.
+         */
+        public static function render_sha2_key_notice( $inline = false ) {
+            if ( ! self::has_sha2_key_configured() ) {
+                return;
+            }
+
+            $allowed = array(
+                'strong' => array(),
+                'br'     => array(),
+                'a'      => array(
+                    'href'   => true,
+                    'target' => true,
+                    'rel'    => true,
+                ),
+                'ul'     => array( 'class' => true ),
+                'li'     => array(),
+            );
+
+            $header = '<strong>' . esc_html__( 'Acción requerida: actualización de seguridad pendiente', 'cecabank-woocommerce' ) . '</strong><br>'
+                . sprintf(
+                    /* translators: %d: length of the legacy secret key */
+                    esc_html__( 'Tu comercio está configurado con una clave de %d caracteres. Para completar la adaptación de seguridad debes:', 'cecabank-woocommerce' ),
+                    self::SHA2_KEY_LENGTH
+                );
+
+            $list = '<ul class="ul-disc">'
+                . '<li>' . sprintf(
+                    /* translators: %1$s: opening link tag to the Cecabank merchant portal, %2$s: closing link tag */
+                    esc_html__( 'Configurar la nueva clave de 32 caracteres que puedes encontrar en el %1$sPortal de Administración del TPV Virtual%2$s, en la configuración de tu comercio.', 'cecabank-woocommerce' ),
+                    self::get_notice_link_tag( 'https://comercios.ceca.es/' ),
+                    '</a>'
+                ) . '</li>'
+                . '<li>' . sprintf(
+                    /* translators: %1$s and %3$s: opening link tags (security bulletin, plugin manual), %2$s and %4$s: closing link tags */
+                    esc_html__( '📖 Más información: %1$sBoletín de Seguridad%2$s %3$sManual plugin%4$s', 'cecabank-woocommerce' ),
+                    self::get_notice_link_tag( 'https://comercios.ceca.es/docs_constpv/seguridad/TPV_Virtual_Boletin_de_Seguridad_0525_001.pdf' ),
+                    '</a>',
+                    self::get_notice_link_tag( '' ),
+                    '</a>'
+                ) . '</li>'
+                . '</ul>';
+
+            $footer = esc_html__( 'Si ya has completado estas actualizaciones, puedes ignorar este mensaje.', 'cecabank-woocommerce' );
+
+            $class = $inline ? 'notice notice-warning inline' : 'notice notice-warning';
+
+            echo '<div class="' . esc_attr( $class ) . '">';
+            echo '<p>' . wp_kses( $header, $allowed ) . '</p>';
+            echo wp_kses( $list, $allowed );
+            echo '<p>' . wp_kses( $footer, $allowed ) . '</p>';
+            echo '</div>';
+        }
+
+        /**
+         * Global admin notice, printed on every admin page while a legacy SHA2 key is configured.
+         */
+        public static function admin_notice_sha2_key() {
+            global $current_section;
+
+            if ( ! current_user_can( 'manage_woocommerce' ) ) {
+                return;
+            }
+
+            // The gateway settings page prints its own copy above the form (see admin_options()).
+            $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+            if ( $screen && 'woocommerce_page_wc-settings' === $screen->id && 'cecabank_gateway' === $current_section ) {
+                return;
+            }
+
+            self::render_sha2_key_notice( false );
+        }
+
+        /**
          * Constructor for the gateway.
          */
         public function __construct() {
@@ -185,7 +309,7 @@ function wc_cecabank_gateway_init() {
                     $lang = '1';
                     break;
             }
-            $cifrado = strlen( (string) $this->secret_key ) === 8 ? 'SHA2' : 'HMAC';
+            $cifrado = self::is_sha2_key( $this->secret_key ) ? 'SHA2' : 'HMAC';
             return array(
                 'Environment' => $this->environment,
                 'MerchantID' => $this->merchant,
@@ -325,6 +449,13 @@ function wc_cecabank_gateway_init() {
             ) );
         }
 
+        /**
+         * Gateway settings page: show the security notice above the form while a legacy key is set.
+         */
+        public function admin_options() {
+            self::render_sha2_key_notice( true );
+            parent::admin_options();
+        }
 
         /**
          * Output for the order received page.
@@ -828,6 +959,8 @@ function wc_cecabank_gateway_init() {
         }
 
     } // end \WC_Gateway_Cecabank class
+
+    add_action( 'admin_notices', array( 'WC_Gateway_Cecabank', 'admin_notice_sha2_key' ) );
 }
 
 add_action( 'woocommerce_blocks_loaded', 'extend_store_api' );
