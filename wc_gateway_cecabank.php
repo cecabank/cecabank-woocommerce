@@ -102,7 +102,7 @@ function wc_cecabank_gateway_init() {
          * URL of the plugin manual linked from the security notice. Leave empty until the final
          * URL is available: the notice then shows "Manual plugin" as plain text instead of a link.
          */
-        const MANUAL_URL = '';
+        const MANUAL_URL = 'https://comercios.ceca.es/resourcesPortal/descargables_portal/manual_woocommerce.pdf';
 
         /**
          * Whether a secret key is a legacy SHA2 key.
