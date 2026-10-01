@@ -1,7 +1,7 @@
 === Cecabank WooCommerce Plugin ===
 Contributors: cecabank
 Tags: cecabank, tpv, payments, gateway
-Stable tag: 0.4.2
+Stable tag: 0.4.3
 Tested up to: 7.1
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
