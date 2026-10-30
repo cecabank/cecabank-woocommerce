@@ -1,7 +1,7 @@
 === Cecabank WooCommerce Plugin ===
 Contributors: cecabank
 Tags: cecabank, tpv, payments, gateway
-Stable tag: 0.4.3
+Stable tag: 0.4.4
 Tested up to: 7.1
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -45,3 +45,17 @@ To use the plugin you need access to a Cecabank virtual POS (TPV) in order to ob
 1. Plugin in the WordPress dashboard. Click "Install Now".
 2. Plugin settings page. Here you can manage your credentials and display options.
 3. The plugin as shown on the checkout page.
+
+== Changelog ==
+
+= 0.4.4 =
+* Security: the secret key is now write-only in the gateway settings. Its value is no longer rendered into the admin HTML; leave the field blank to keep the stored key or type a new one to replace it.
+
+= 0.4.3 =
+* Added the plugin manual URL to the security notice.
+
+= 0.4.2 =
+* Showed the plugin manual as plain text in the security notice until its URL was available.
+
+= 0.4.1 =
+* Fixed the incoming notification signature to always use SHA2.

@@ -5,7 +5,7 @@
  * Description: Plugin de WooCommerce para conectar con la pasarela de Cecabank.
  * Author: Cecabank, S.A.
  * Author URI: https://www.cecabank.es/
- * Version: 0.4.3
+ * Version: 0.4.4
  * Text Domain: cecabank-woocommerce
  *
  * Copyright: (c) 2019 Cecabank, S.A. (tpv@cecabank.es) y WooCommerce
@@ -72,7 +72,7 @@ try {
  *
  * @class 		WC_Gateway_Cecabank
  * @extends		WC_Payment_Gateway
- * @version		0.4.3
+ * @version		0.4.4
  * @package		WooCommerce/Classes/Payment
  * @author 		Cecabank, S.A.
  */
@@ -329,7 +329,7 @@ function wc_cecabank_gateway_init() {
                 'Cifrado' => $cifrado,
                 'Idioma' => $lang,
                 'Pago_soportado' => 'SSL',
-                'versionMod' => 'W-0.4.3'
+                'versionMod' => 'W-0.4.4'
             );
         }
 
@@ -390,8 +390,8 @@ function wc_cecabank_gateway_init() {
 
                 'secret_key' => array(
                     'title'       => __( 'Clave Secreta', 'cecabank-woocommerce' ),
-                    'type'        => 'password',
-                    'description' => __( 'Clave secreta dada por Cecabank. Si tiene 8 caracteres se usará el algoritmo SHA2; en otro caso (clave HMAC, normalmente 32 caracteres) se usará HMAC.', 'cecabank-woocommerce' ),
+                    'type'        => 'secret_key',
+                    'description' => __( 'Clave secreta dada por Cecabank. Si tiene 8 caracteres se usará el algoritmo SHA2; en otro caso (clave HMAC, normalmente 32 caracteres) se usará HMAC. Por seguridad, la clave guardada no se muestra: deja el campo en blanco para conservar la actual o escribe una nueva para reemplazarla.', 'cecabank-woocommerce' ),
                     'default'     => '',
                     'desc_tip'    => true,
                 ),
@@ -456,6 +456,84 @@ function wc_cecabank_gateway_init() {
                     'default' => apply_filters( 'woocommerce_cecabank_icon', $this->icon )
                 ),
             ) );
+        }
+
+        /**
+         * Render the secret key field as a write-only credential.
+         *
+         * The stored secret is never written to the HTML: the input is always
+         * rendered empty so the real value cannot be read from the page source
+         * (or exfiltrated through an XSS on the settings screen). When a key is
+         * already saved, a neutral placeholder signals that leaving the field
+         * blank keeps the current credential. Mirrors the markup of
+         * WC_Settings_API::generate_password_html().
+         *
+         * @param string $key  Field key.
+         * @param array  $data Field definition.
+         * @return string
+         */
+        public function generate_secret_key_html( $key, $data ) {
+            $field_key = $this->get_field_key( $key );
+            $defaults  = array(
+                'title'             => '',
+                'disabled'          => false,
+                'class'             => '',
+                'css'               => '',
+                'placeholder'       => '',
+                'type'              => 'password',
+                'desc_tip'          => false,
+                'description'       => '',
+                'custom_attributes' => array(),
+            );
+
+            $data = wp_parse_args( $data, $defaults );
+
+            // Signal that a credential already exists without revealing it.
+            $has_key = '' !== (string) $this->get_option( $key );
+            if ( '' === $data['placeholder'] ) {
+                $data['placeholder'] = $has_key
+                    ? __( 'Clave configurada (déjalo en blanco para conservarla)', 'cecabank-woocommerce' )
+                    : __( 'Introduce la clave secreta', 'cecabank-woocommerce' );
+            }
+
+            ob_start();
+            ?>
+            <tr valign="top">
+                <th scope="row" class="titledesc">
+                    <label for="<?php echo esc_attr( $field_key ); ?>"><?php echo wp_kses_post( $data['title'] ); ?> <?php echo $this->get_tooltip_html( $data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></label>
+                </th>
+                <td class="forminp">
+                    <fieldset>
+                        <legend class="screen-reader-text"><span><?php echo wp_kses_post( $data['title'] ); ?></span></legend>
+                        <input class="input-text regular-input <?php echo esc_attr( $data['class'] ); ?>" type="password" name="<?php echo esc_attr( $field_key ); ?>" id="<?php echo esc_attr( $field_key ); ?>" style="<?php echo esc_attr( $data['css'] ); ?>" value="" placeholder="<?php echo esc_attr( $data['placeholder'] ); ?>" autocomplete="new-password" <?php disabled( $data['disabled'], true ); ?> <?php echo $this->get_custom_attribute_html( $data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> />
+                        <?php echo $this->get_description_html( $data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                    </fieldset>
+                </td>
+            </tr>
+            <?php
+
+            return ob_get_clean();
+        }
+
+        /**
+         * Validate (and preserve) the secret key on save.
+         *
+         * Keeps the credential write-only: an empty submission leaves the stored
+         * key untouched instead of wiping it, so the merchant does not need to
+         * retype the secret on every settings save. A non-empty value replaces it.
+         *
+         * @param string $key   Field key.
+         * @param string $value Posted value.
+         * @return string
+         */
+        public function validate_secret_key_field( $key, $value ) {
+            $value = is_null( $value ) ? '' : wp_unslash( trim( (string) $value ) );
+
+            if ( '' === $value ) {
+                return (string) $this->get_option( $key );
+            }
+
+            return $value;
         }
 
         /**
